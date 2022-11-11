@@ -33,7 +33,7 @@ func (s *dishServices) GetDishByID(c *gin.Context) (model.Dish, error){
 	if err!=nil{
 		return model.Dish{},err
 	}
-	return s.repo.DeleteDish(id)
+	return s.repo.GetDishByID(id)
 }
 
 func (s *dishServices) CreateDish(c *gin.Context) (error){
@@ -48,7 +48,19 @@ func (s *dishServices) CreateDish(c *gin.Context) (error){
 	return s.repo.CreateDish(&dish)
 }
 func (s *dishServices) UpdateDish(c *gin.Context) (error){
-	return nil
+	id,err:=strconv.Atoi(c.Param("id"))
+	if err!=nil{
+		return err
+	}
+	dish,err:=s.repo.GetDishByID(id)
+	if err!=nil{
+		return err
+	}
+	var jsonData model.DishTemplate
+	if err := c.BindJSON(&jsonData); err != nil {
+		return err
+	}
+	return s.repo.UpdateDish(id,&dish,&jsonData)
 }
 func (s *dishServices) DeleteDish(c *gin.Context) (error){
 	id,err:=strconv.Atoi(c.Param("id"))

@@ -10,7 +10,7 @@ type DishRepository interface {
 	GetAllDish() ([]model.Dish, error)
 	GetDishByID(id int) (model.Dish, error)
 	CreateDish(dish *model.Dish) error
-	UpdateDish(dish *model.Dish) error
+	UpdateDish(id int ,dish *model.Dish,newDish *model.DishTemplate) error
 	DeleteDish(id int) error
 }
 
@@ -45,7 +45,13 @@ func (r *dishRepository) CreateDish(dish *model.Dish) (error){
 	}
 	return nil
 }
-func (r *dishRepository) UpdateDish(dish *model.Dish) (error){
+func (r *dishRepository) UpdateDish(id int,dish *model.Dish,newDish *model.DishTemplate) (error){
+	if err:= r.db.Model(&dish).Where("id = ?", id).Updates(newDish).Error;err!=nil{
+		return err
+	}
+	if err:=r.db.Save(&dish).Error;err != nil {
+		return err
+	}
 	return nil
 }
 func (r *dishRepository) DeleteDish(id int) (error){

@@ -19,9 +19,9 @@ func NewDishDelivery(dishServices services.DishServices) DishDelivery{
 }
 
 func (d *dishDelivery) Mount(group *gin.RouterGroup) {
+	group.GET("/:id", d.getDishByID)
 	group.GET("/", d.getAllDish)
 	group.POST("/", d.createDish)
-	group.GET("/:id", d.getDishByID)
 	group.PUT("/:id", d.UpdateDish)
 	group.DELETE("/:id", d.DeleteDish)
 }
@@ -41,7 +41,7 @@ func (d *dishDelivery) getAllDish(c *gin.Context){
 	})
 }
 func (d *dishDelivery) getDishByID(c *gin.Context){
-	res,err:=d.dishService.GetAllDish()
+	res,err:=d.dishService.GetDishByID(c)
 	if err != nil{
 		c.JSON(http.StatusInternalServerError,gin.H{
 			"status":"Error",
@@ -69,9 +69,17 @@ func (d *dishDelivery) createDish(c *gin.Context){
 		})
 }
 func (d *dishDelivery) UpdateDish(c *gin.Context){
+	err:=d.dishService.UpdateDish(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Error",
+			"message": err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK,gin.H{
 		"status":"Success",
-		"message":"Dish Successfully Updated",
+		"message":"Dish Updated",
 	})
 }
 func (d *dishDelivery) DeleteDish(c *gin.Context){

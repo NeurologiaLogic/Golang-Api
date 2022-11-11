@@ -18,8 +18,8 @@ Flow File Structure from Bottom Up
 Current Progress:
 - [v] Create Food
 - [v] Read Food
-- [x] Update Food
-- [x] Delete Food
+- [v] Update Food
+- [v] Delete Food
 - [x] Create Drink
 - [x] Read Drink
 - [x] Update Drink

@@ -1,23 +1,24 @@
 package delivery
 
 import (
-	"github.com/gin-gonic/gin"
-	"rest-api/services"
 	"net/http"
+	"rest-api/services"
+
+	"github.com/gin-gonic/gin"
 )
-type Delivery interface {
+type DishDelivery interface {
 	Mount(group *gin.RouterGroup)
 }
 
-type delivery struct {
+type dishDelivery struct {
 	dishService services.DishServices
 }
 
-func NewDishDelivery(dishServices services.DishServices) *delivery{
-	return &delivery{dishServices}
+func NewDishDelivery(dishServices services.DishServices) DishDelivery{
+	return &dishDelivery{dishServices}
 }
 
-func (d *delivery) Mount(group *gin.RouterGroup) {
+func (d *dishDelivery) Mount(group *gin.RouterGroup) {
 	group.GET("/", d.getAllDish)
 	group.POST("/", d.createDish)
 	group.GET("/:id", d.getDishByID)
@@ -25,36 +26,66 @@ func (d *delivery) Mount(group *gin.RouterGroup) {
 	group.DELETE("/:id", d.DeleteDish)
 }
 
-func (d *delivery) getAllDish(c *gin.Context){
-	// c.JSON(http.StatusOK,gin.H{
-	// 	"status":"Success",
-	// 	"message":[]string{"Dish1","Dish2","Dish3"},
-	// })
-	d.dishService.GetAllDish()
-}
-func (d *delivery) getDishByID(c *gin.Context){
-	// c.JSON(http.StatusOK,gin.H{
-	// 	"status":"Success",
-	// 	"message":"Dish1",
-	// })
-	d.dishService.GetDishByID(1)
-}
-func (d *delivery) createDish(c *gin.Context){
+func (d *dishDelivery) getAllDish(c *gin.Context){
+	res,err:=d.dishService.GetAllDish()
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{
+			"status":"Error",
+			"message":err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK,gin.H{
 		"status":"Success",
-		"message":"New Dish Created",
+		"message":res,
 	})
 }
-func (d *delivery) UpdateDish(c *gin.Context){
+func (d *dishDelivery) getDishByID(c *gin.Context){
+	res,err:=d.dishService.GetAllDish()
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{
+			"status":"Error",
+			"message":err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK,gin.H{
+		"status":"Success",
+		"message":res,
+	})
+}
+func (d *dishDelivery) createDish(c *gin.Context){
+		err:=d.dishService.CreateDish(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "Error",
+				"message": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK,gin.H{
+			"status":"Success",
+			"message":"New Dish Created",
+		})
+}
+func (d *dishDelivery) UpdateDish(c *gin.Context){
 	c.JSON(http.StatusOK,gin.H{
 		"status":"Success",
 		"message":"Dish Successfully Updated",
 	})
 }
-func (d *delivery) DeleteDish(c *gin.Context){
+func (d *dishDelivery) DeleteDish(c *gin.Context){
+	err:=d.dishService.DeleteDish(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Error",
+			"message": err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK,gin.H{
 		"status":"Success",
-		"message":"Dish Successfully Deleted",
+		"message":"Dish Deleted",
 	})
 }
 // dah bener

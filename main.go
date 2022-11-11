@@ -18,16 +18,19 @@ func setupRouter() *gin.Engine{
 	db:=setupDB()
 	r:=gin.Default()
 	r.TrustedPlatform = gin.PlatformGoogleAppEngine
-	dishRepo:=repository.NewDishTestRepository(db)
-	// dishRepo:=repository.NewDishRepository(db)
+	// dishRepo:=repository.NewDishTestRepository(db)
+	dishRepo:=repository.NewDishRepository(db)
 	dishServices:=services.NewDishServices(dishRepo)
-	dishDelivery:=delivery.NewDishDelivery(*dishServices)
+	dishDelivery:=delivery.NewDishDelivery(dishServices)
 	dishGroup := r.Group("/dish")
 	dishDelivery.Mount(dishGroup)
 
 
-
-
+	drinkRepo :=repository.NewDrinkRepository(db)
+	drinkServices := services.NewDrinkServices(drinkRepo)
+	drinkDelivery := delivery.NewDrinkDelivery(drinkServices)
+	drinkGroup := r.Group("/drink")
+	drinkDelivery.Mount(drinkGroup)
 	return r
 }
 
